@@ -7,65 +7,78 @@
     <title>Student App</title>
     <script src="lib/angular.js"></script>
     <script src="app.js"></script>
-    <script src="js/StudentsController.js"></script>
+    <script src="controllers/StudentsController.js"></script>
+    <script src="controllers/FieldTripsCtrl.js"></script>
     <link rel="stylesheet" href="css/bootstrap.min.css">
   </head>
   <body>
     <!-- any directives inside of that div should refer to the `StudentsCtrl` controller, and any data that it pulls should come from the `$scope` in that controller -->
-    <div class="container" ng-controller="StudentsCtrl">
-      <div class="row" ng-show="students.length">
-        <div class="col-md-12">
-          <h4>Search Students</h4>
-          <form class="form-inline" role="form">
-            <div class="form-group">
-              <input ng-model="query" type="text" class="form-control" id="student-name" placeholder="Search">
-            </div>
-          </form>
+    <div class="container">
+      <div ng-controller="StudentsCtrl">
+        <div class="row" ng-show="students.length">
+          <div class="col-md-12">
+            <h4>Search Students</h4>
+            <form class="form-inline" role="form">
+              <div class="form-group">
+                <input ng-model="query" type="text" class="form-control" id="student-name" placeholder="Search">
+              </div>
+            </form>
+          </div>
+        </div>
+        <div class="row">
+          <div class="col-md-12">
+            <h2 ng-show="students.length && filtered.length">Student List</h2>
+            <h2 ng-show="students.length && !filtered.length">No Matches</h2>
+            <ul>
+              <!-- `ng-repeat` directive is used to iterate through data that is stored in the `$scope` via the controller -->
+              <li ng-repeat="item in filtered = (students | filter:query)">
+                <!-- we use the `ng-click` directive to set a new property
+                called `editing` equal to `true` when the name of a student in our list is clicked. We've also
+                attached the `ng-hide` directive to that same span, which will automatically hide the given
+                element when the expression provided evaluates to `true`. Since `editing` gets set to true by
+                being clicked, the `span` gets hidden when it is clicked. -->
+                <span ng-click="editing = true" ng-hide="editing">
+                <!-- when the word Delete is clicked, the app will run the `deleteStudent` method. We have passed `item` into the method so it knows which particular object to delete -->
+                  {{item.name}} <a ng-click="deleteStudent(item)"><button class="btn-danger">Delete</button></a>
+                </span>
+                <!-- we use the `ng-show` directive (which works exactly opposite to `ng-hide`)
+                to reveal our new form. So when the first `span` is clicked and gets hidden, this next `span`
+                is revealed, since `editing` is now true. -->
+                <!-- when that form gets submitted, our `editing` property will be set to `false`, switching which `span` is hidden and which is shown. -->
+                <!-- <span class="form-group" ng-show="editing" ng-submit="editing = false"> -->
+                <span class="form-group" ng-show="editing" ng-submit="editing = false">
+                  <form class="form-inline" role="form">
+                    <input type="text" class="form-control input-sm" ng-model="item.name"
+                    placeholder="Name" required/>
+                    <button class="btn btn-default btn-sm" type="submit">Save</button>
+                  </form>
+                </span>
+              </li>
+            </ul>
+          </div>
+          <div class="col-md-4">
+            <h2>New Student</h2>
+              <!-- `ng-submit` directive will trigger the `addStudent` method when that
+              form is submitted. The directive `ng-model` creates a new property on `$scope` in our
+              `StudentsCtrl` controller called `studentName` and sets it to the value of the input -->
+            <form ng-submit="addStudent()" class="form-inline" role="form">
+              <!-- ng-model two-way data binding in Angular apps is the automatic synchronization of data between the model and view components -->
+              <div class="form-group">
+                <input type="text" ng-model="studentName" class="form-control" placeholder="Enter name">
+              </div>
+              <button type="submit" class="btn btn-default">Submit</button>
+            </form>
+          </div>
         </div>
       </div>
-      <div class="row">
-        <div class="col-md-12">
-          <h2 ng-show="students.length && filtered.length">Student List</h2>
-          <h2 ng-show="students.length && !filtered.length">No Matches</h2>
+      <div class="row permission" ng-controller="FieldTripsCtrl">
+        <div class="col-md- 6">
+          <h2>Permission Slips</h2>
           <ul>
-            <!-- `ng-repeat` directive is used to iterate through data that is stored in the `$scope` via the controller -->
-            <li ng-repeat="item in filtered = (students | filter:query)">
-              <!-- we use the `ng-click` directive to set a new property
-              called `editing` equal to `true` when the name of a student in our list is clicked. We've also
-              attached the `ng-hide` directive to that same span, which will automatically hide the given
-              element when the expression provided evaluates to `true`. Since `editing` gets set to true by
-              being clicked, the `span` gets hidden when it is clicked. -->
-              <span ng-click="editing = true" ng-hide="editing">
-              <!-- when the word Delete is clicked, the app will run the `deleteStudent` method. We have passed `item` into the method so it knows which particular object to delete -->
-                {{item.name}} <a ng-click="deleteStudent(item)"><button class="btn-danger">Delete</button></a>
-              </span>
-              <!-- we use the `ng-show` directive (which works exactly opposite to `ng-hide`)
-              to reveal our new form. So when the first `span` is clicked and gets hidden, this next `span`
-              is revealed, since `editing` is now true. -->
-              <!-- when that form gets submitted, our `editing` property will be set to `false`, switching which `span` is hidden and which is shown. -->
-              <!-- <span class="form-group" ng-show="editing" ng-submit="editing = false"> -->
-              <span class="form-group" ng-show="editing" ng-submit="editing = false">
-                <form class="form-inline" role="form">
-                  <input type="text" class="form-control input-sm" ng-model="item.name"
-                  placeholder="Name" required/>
-                  <button class="btn btn-default btn-sm" type="submit">Save</button>
-                </form>
-              </span>
+            <li ng-repeat="item in studentsWithPermission">
+            {{item.name}}
             </li>
           </ul>
-        </div>
-        <div class="col-md-4">
-          <h2>New Student</h2>
-            <!-- `ng-submit` directive will trigger the `addStudent` method when that
-            form is submitted. The directive `ng-model` creates a new property on `$scope` in our
-            `StudentsCtrl` controller called `studentName` and sets it to the value of the input -->
-          <form ng-submit="addStudent()" class="form-inline" role="form">
-            <!-- ng-model two-way data binding in Angular apps is the automatic synchronization of data between the model and view components -->
-            <div class="form-group">
-              <input type="text" ng-model="studentName" class="form-control" placeholder="Enter name">
-            </div>
-            <button type="submit" class="btn btn-default">Submit</button>
-          </form>
         </div>
       </div>
     </div>
