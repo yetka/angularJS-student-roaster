@@ -13,22 +13,23 @@
   <body>
     <!-- any directives inside of that div should refer to the `StudentsCtrl` controller, and any data that it pulls should come from the `$scope` in that controller -->
     <div class="container" ng-controller="StudentsCtrl">
-      <div class="row">
-        <div class="col-md- 12">
+      <div class="row" ng-show="students.length">
+        <div class="col-md-12">
           <h4>Search Students</h4>
           <form class="form-inline" role="form">
             <div class="form-group">
-              <input ng-model="query" type="text" class="form-control" placeholder="Search">
+              <input ng-model="query" type="text" class="form-control" id="student-name" placeholder="Search">
             </div>
           </form>
         </div>
       </div>
       <div class="row">
-        <div class="col-md-6">
-          <h2>Student List</h2>
+        <div class="col-md-12">
+          <h2 ng-show="students.length && filtered.length">Student List</h2>
+          <h2 ng-show="students.length && !filtered.length">No Matches</h2>
           <ul>
             <!-- `ng-repeat` directive is used to iterate through data that is stored in the `$scope` via the controller -->
-            <li ng-repeat="item in students | filter:query">
+            <li ng-repeat="item in filtered = (students | filter:query)">
               <!-- we use the `ng-click` directive to set a new property
               called `editing` equal to `true` when the name of a student in our list is clicked. We've also
               attached the `ng-hide` directive to that same span, which will automatically hide the given
@@ -53,7 +54,7 @@
             </li>
           </ul>
         </div>
-        <div class="col-md-6">
+        <div class="col-md-4">
           <h2>New Student</h2>
             <!-- `ng-submit` directive will trigger the `addStudent` method when that
             form is submitted. The directive `ng-model` creates a new property on `$scope` in our
